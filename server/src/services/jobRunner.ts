@@ -6,6 +6,7 @@ import { generateScript } from "./scriptGenerator";
 import { createVoiceAudio } from "./tts";
 import { renderProductVideo } from "./videoRenderer";
 import { addJobLog, failJob, getJobOrThrow, setJobStatus, updateJob } from "./jobManager";
+import { deleteOldJobFiles } from "./storageCleanup";
 
 const activeJobs = new Set<string>();
 
@@ -63,6 +64,7 @@ async function run(jobId: string) {
       }
     });
     updateJob(jobId, { video_path: videoPath, status: "completed" });
+    await deleteOldJobFiles(jobId);
     addJobLog(jobId, "Hoàn thành video");
   } catch (error) {
     failJob(jobId, error);
@@ -90,5 +92,6 @@ export async function rerenderJob(jobId: string, patch: Partial<CreateJobInput>)
     }
   });
   updateJob(jobId, { video_path: videoPath, status: "completed" });
+  await deleteOldJobFiles(jobId);
   addJobLog(jobId, "Render lại video hoàn tất");
 }

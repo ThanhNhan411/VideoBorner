@@ -41,6 +41,16 @@ export function listJobs(limit = 10): JobRecord[] {
     .all(limit) as JobRecord[];
 }
 
+export function listJobsWithFiles(excludeJobId: string): JobRecord[] {
+  return db
+    .prepare(
+      `SELECT * FROM jobs
+       WHERE id != ?
+         AND (video_path IS NOT NULL OR audio_path IS NOT NULL OR assets_json IS NOT NULL)`
+    )
+    .all(excludeJobId) as JobRecord[];
+}
+
 export function updateJob(id: string, patch: Partial<Omit<JobRecord, "id" | "created_at">>) {
   const entries = Object.entries({ ...patch, updated_at: new Date().toISOString() }).filter(
     ([, value]) => value !== undefined
