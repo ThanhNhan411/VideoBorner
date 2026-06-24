@@ -26,7 +26,8 @@ export const config = {
   geminiModel: process.env.GEMINI_MODEL ?? "gemini-2.5-flash",
   kiraApiKey: process.env.KIRA_API_KEY || process.env.OPENAI_API_KEY,
   kiraBaseUrl: process.env.KIRA_BASE_URL || process.env.LOCAL_LLM_BASE_URL || "https://kiraai.vn/api/v1",
-  kiraModel: process.env.KIRA_MODEL ?? "kira-mini-1.0"
+  kiraModel: process.env.KIRA_MODEL ?? "kira-mini-1.0",
+  edgeTtsProxy: process.env.EDGE_TTS_PROXY?.trim() || undefined
 };
 
 export const storagePaths = {

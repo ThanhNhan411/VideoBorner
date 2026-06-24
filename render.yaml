@@ -26,6 +26,8 @@ services:
         value: 8000000
       - key: DEFAULT_VOICE
         value: vi-VN-HoaiMyNeural
+      - key: EDGE_TTS_PROXY
+        sync: false
       - key: GEMINI_API_KEY
         sync: false
       - key: GEMINI_API_KEYS
