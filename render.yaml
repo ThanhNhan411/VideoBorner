@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: video-borner
+    runtime: docker
+    plan: starter
+    branch: main
+    healthCheckPath: /api/health
+    disk:
+      name: video-borner-storage
+      mountPath: /app/storage
+      sizeGB: 10
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: APP_BASE_URL
+        sync: false
+      - key: DATABASE_PATH
+        value: /app/storage/jobs/jobs.sqlite
+      - key: STORAGE_DIR
+        value: /app/storage
+      - key: MAX_IMAGE_DOWNLOADS
+        value: 6
+      - key: MAX_IMAGE_BYTES
+        value: 8000000
+      - key: DEFAULT_VOICE
+        value: vi-VN-HoaiMyNeural
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEYS
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: KIRA_API_KEY
+        sync: false
+      - key: KIRA_BASE_URL
+        value: https://kiraai.vn/api/v1
+      - key: KIRA_MODEL
+        value: kira-mini-1.0
