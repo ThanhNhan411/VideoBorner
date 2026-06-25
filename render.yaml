@@ -28,17 +28,9 @@ services:
         value: vi-VN-HoaiMyNeural
       - key: EDGE_TTS_PROXY
         sync: false
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: GEMINI_API_KEYS
-        sync: false
-      - key: GEMINI_MODEL
-        value: gemini-2.5-flash
       - key: KIRA_API_KEY
         sync: false
       - key: KIRA_BASE_URL
         value: https://kiraai.vn/api/v1
       - key: KIRA_MODEL
         value: kira-mini-1.0
-      - key: ENABLE_KIRA_SCRIPT
-        value: false

@@ -1,4 +1,3 @@
-import { GoogleGenAI } from "@google/genai";
 import OpenAI from "openai";
 import { config } from "../config";
 import type { CreateJobInput, GeneratedScript, ProductData, VideoDuration } from "../types";
@@ -15,15 +14,7 @@ const toneLabels: Record<string, string> = {
 const maxAiResponseChars = 12_000;
 
 export async function generateScript(product: ProductData, input: CreateJobInput): Promise<GeneratedScript> {
-  if (config.geminiApiKeys.length) {
-    try {
-      return await generateScriptWithGemini(product, input);
-    } catch (error) {
-      console.warn(`Gemini script generation failed: ${formatError(error)}`);
-    }
-  }
-
-  if (config.kiraApiKey && config.enableKiraScript) {
+  if (config.kiraApiKey) {
     try {
       return await generateScriptWithKira(product, input);
     } catch (error) {
@@ -65,42 +56,9 @@ function generateTemplateScript(product: ProductData, input: CreateJobInput): Ge
   };
 }
 
-async function generateScriptWithGemini(product: ProductData, input: CreateJobInput): Promise<GeneratedScript> {
-  const spokenName = compactProductName(product.title);
-  const prompt = buildGeminiPrompt(product, input, spokenName);
-  const models = uniqueValues([config.geminiModel, "gemini-2.5-flash", "gemini-2.0-flash"]);
-  let lastError: unknown;
-
-  for (const [keyIndex, apiKey] of config.geminiApiKeys.entries()) {
-    const ai = new GoogleGenAI({ apiKey });
-
-    for (const model of models) {
-      try {
-        const response = await ai.models.generateContent({
-          model,
-          contents: prompt,
-          config: {
-            responseMimeType: "application/json",
-            maxOutputTokens: 700,
-            temperature: 0.75
-          }
-        });
-
-        const parsed = parseJsonResponse(response.text ?? "");
-        return normalizeGeneratedScript(parsed, product, input, spokenName);
-      } catch (error) {
-        lastError = error;
-        console.warn(`Gemini key ${keyIndex + 1} failed with model ${model}: ${formatError(error)}`);
-      }
-    }
-  }
-
-  throw lastError instanceof Error ? lastError : new Error(String(lastError));
-}
-
 async function generateScriptWithKira(product: ProductData, input: CreateJobInput): Promise<GeneratedScript> {
   const spokenName = compactProductName(product.title);
-  const prompt = buildGeminiPrompt(product, input, spokenName);
+  const prompt = buildScriptPrompt(product, input, spokenName);
   const client = new OpenAI({
     baseURL: config.kiraBaseUrl,
     apiKey: config.kiraApiKey,
@@ -126,7 +84,7 @@ async function generateScriptWithKira(product: ProductData, input: CreateJobInpu
   return normalizeGeneratedScript(parsed, product, input, spokenName);
 }
 
-function buildGeminiPrompt(product: ProductData, input: CreateJobInput, spokenName: string) {
+function buildScriptPrompt(product: ProductData, input: CreateJobInput, spokenName: string) {
   return [
     "Bạn là copywriter TikTok Shop tiếng Việt.",
     "Hãy tạo kịch bản video ngắn dạng TikTok/Reels cho sản phẩm dựa CHỈ trên dữ liệu được cung cấp.",
@@ -190,7 +148,7 @@ function normalizeGeneratedScript(
   spokenName: string
 ): GeneratedScript {
   if (!value || typeof value !== "object") {
-    throw new Error("Gemini không trả về JSON object");
+    throw new Error("AI không trả về JSON object");
   }
 
   const object = value as Partial<GeneratedScript>;
@@ -259,10 +217,6 @@ function normalizeHashtags(value: unknown, fallback: string[]) {
     .map((item) => (item.startsWith("#") ? item : `#${item.replace(/^#+/, "")}`))
     .slice(0, 8);
   return hashtags.length ? hashtags : fallback;
-}
-
-function uniqueValues(values: string[]) {
-  return [...new Set(values.filter(Boolean))];
 }
 
 function trimForDuration(text: string, duration: VideoDuration) {

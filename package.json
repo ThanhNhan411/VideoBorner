@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@fontsource/be-vietnam-pro": "^5.2.8",
-    "@google/genai": "^1.32.0",
     "@remotion/bundler": "^4.0.482",
     "@remotion/renderer": "^4.0.482",
     "better-sqlite3": "^11.10.0",
