@@ -12,6 +12,8 @@ const toneLabels: Record<string, string> = {
   premium: "sang trọng"
 };
 
+const maxAiResponseChars = 12_000;
+
 export async function generateScript(product: ProductData, input: CreateJobInput): Promise<GeneratedScript> {
   if (config.geminiApiKeys.length) {
     try {
@@ -79,6 +81,7 @@ async function generateScriptWithGemini(product: ProductData, input: CreateJobIn
           contents: prompt,
           config: {
             responseMimeType: "application/json",
+            maxOutputTokens: 700,
             temperature: 0.75
           }
         });
@@ -100,7 +103,9 @@ async function generateScriptWithKira(product: ProductData, input: CreateJobInpu
   const prompt = buildGeminiPrompt(product, input, spokenName);
   const client = new OpenAI({
     baseURL: config.kiraBaseUrl,
-    apiKey: config.kiraApiKey
+    apiKey: config.kiraApiKey,
+    timeout: 25_000,
+    maxRetries: 1
   });
 
   const response = await client.chat.completions.create({
@@ -112,6 +117,7 @@ async function generateScriptWithKira(product: ProductData, input: CreateJobInpu
       },
       { role: "user", content: prompt }
     ],
+    max_tokens: 700,
     temperature: 0.75
   });
 
@@ -131,12 +137,12 @@ function buildGeminiPrompt(product: ProductData, input: CreateJobInput, spokenNa
     "",
     `Tone: ${toneLabels[input.tone] ?? "review chân thật"}`,
     `Thời lượng: ${input.duration}s`,
-    `Tên đầy đủ: ${product.title}`,
+    `Tên đầy đủ: ${limitText(product.title, 180)}`,
     `Tên đọc ngắn: ${spokenName}`,
-    `Giá: ${product.price ?? "không có"}`,
-    `Mô tả: ${product.description ?? "không có"}`,
-    `Điểm nổi bật: ${product.highlights.length ? product.highlights.join("; ") : "không có"}`,
-    `Shop/brand: ${product.shopName ?? product.brand ?? "không có"}`,
+    `Giá: ${limitText(product.price ?? "không có", 80)}`,
+    `Mô tả: ${limitText(product.description ?? "không có", 700)}`,
+    `Điểm nổi bật: ${product.highlights.length ? product.highlights.map((item) => limitText(item, 140)).join("; ") : "không có"}`,
+    `Shop/brand: ${limitText(product.shopName ?? product.brand ?? "không có", 100)}`,
     "",
     "Trả về JSON thuần, không markdown, đúng schema:",
     JSON.stringify({
@@ -160,9 +166,16 @@ function buildGeminiPrompt(product: ProductData, input: CreateJobInput, spokenNa
 }
 
 function parseJsonResponse(text: string): unknown {
+  if (text.length > maxAiResponseChars) {
+    throw new Error(`AI trả về nội dung quá lớn (${text.length} ký tự)`);
+  }
   const trimmed = text.trim();
   const json = trimmed.startsWith("```") ? trimmed.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "") : trimmed;
   return JSON.parse(json);
+}
+
+function limitText(value: string, maxLength: number) {
+  return value.replace(/\s+/g, " ").trim().slice(0, maxLength);
 }
 
 function normalizeGeneratedScript(
