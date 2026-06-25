@@ -2,8 +2,8 @@ import { Composition } from "remotion";
 import { ProductVideo } from "./ProductVideo";
 import type { RenderInput } from "./types";
 
-const VIDEO_WIDTH = 720;
-const VIDEO_HEIGHT = 960;
+const VIDEO_WIDTH = 540;
+const VIDEO_HEIGHT = 720;
 const FPS = 24;
 
 const defaultInput: RenderInput = {

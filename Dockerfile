@@ -10,7 +10,7 @@ COPY . .
 RUN npm run build
 
 ENV PORT=3000
-ENV NODE_OPTIONS=--max-old-space-size=1024
+ENV NODE_OPTIONS=--max-old-space-size=256
 EXPOSE 3000 5173
 
 CMD ["npm", "run", "server"]

@@ -15,7 +15,7 @@ services:
       - key: PORT
         value: 3000
       - key: NODE_OPTIONS
-        value: --max-old-space-size=1024
+        value: --max-old-space-size=256
       - key: APP_BASE_URL
         sync: false
       - key: DATABASE_PATH
@@ -23,9 +23,9 @@ services:
       - key: STORAGE_DIR
         value: /app/storage
       - key: MAX_IMAGE_DOWNLOADS
-        value: 4
+        value: 2
       - key: MAX_IMAGE_BYTES
-        value: 8000000
+        value: 4000000
       - key: DEFAULT_VOICE
         value: vi-VN-HoaiMyNeural
       - key: EDGE_TTS_PROXY

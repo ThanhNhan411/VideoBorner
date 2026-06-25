@@ -22,10 +22,14 @@ export async function crawlProduct(productUrl: string): Promise<ProductData> {
 
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({
-    viewport: isTikTok ? { width: 390, height: 1600 } : { width: 1280, height: 1600 },
+    viewport: isTikTok ? { width: 390, height: 900 } : { width: 960, height: 900 },
     userAgent: isTikTok
       ? "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
       : undefined
+  });
+  await page.route("**/*", (route) => {
+    const resourceType = route.request().resourceType();
+    return resourceType === "font" || resourceType === "media" ? route.abort() : route.continue();
   });
   const networkImages = new Set<string>();
   page.on("response", (response) => {
@@ -39,7 +43,7 @@ export async function crawlProduct(productUrl: string): Promise<ProductData> {
   try {
     await page.goto(productUrl, { waitUntil: "domcontentloaded", timeout: 45_000 });
     await page.waitForLoadState("networkidle", { timeout: 10_000 }).catch(() => undefined);
-    for (let index = 0; index < (isTikTok ? 6 : 2); index += 1) {
+    for (let index = 0; index < (isTikTok ? 3 : 1); index += 1) {
       await page.mouse.wheel(0, 900).catch(() => undefined);
       await page.waitForTimeout(600);
     }
