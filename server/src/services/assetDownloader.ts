@@ -33,8 +33,8 @@ export async function downloadAssets(jobId: string, imageUrls: string[]): Promis
     const filePath = path.join(outputDir, `image-${saved.length + 1}.jpg`);
     await sharp(image.buffer)
       .rotate()
-      .resize(1080, 1080, { fit: "inside", withoutEnlargement: true })
-      .jpeg({ quality: 82 })
+      .resize(720, 720, { fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 78 })
       .toFile(filePath);
     saved.push(filePath);
   }

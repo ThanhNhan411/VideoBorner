@@ -2,6 +2,10 @@ import { Composition } from "remotion";
 import { ProductVideo } from "./ProductVideo";
 import type { RenderInput } from "./types";
 
+const VIDEO_WIDTH = 720;
+const VIDEO_HEIGHT = 960;
+const FPS = 24;
+
 const defaultInput: RenderInput = {
   jobId: "preview",
   product: {
@@ -36,13 +40,13 @@ export default function Root() {
     <Composition
       id="ProductVideo"
       component={ProductVideo}
-      durationInFrames={defaultInput.script.duration * 30}
-      fps={30}
-      width={1080}
-      height={1440}
+      durationInFrames={defaultInput.script.duration * FPS}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
       defaultProps={defaultInput}
       calculateMetadata={({ props }) => ({
-        durationInFrames: props.script.duration * 30
+        durationInFrames: props.script.duration * FPS
       })}
     />
   );
