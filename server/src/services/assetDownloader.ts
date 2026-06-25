@@ -2,6 +2,8 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import { config, storagePaths } from "../config";
+import type { RenderQuality } from "../types";
+import { getQualityProfile } from "./qualityProfiles";
 import { assertSafePublicUrl } from "./urlSafety";
 
 const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
@@ -12,13 +14,15 @@ type DownloadedImage = {
   sourceUrl: string;
 };
 
-export async function downloadAssets(jobId: string, imageUrls: string[]): Promise<string[]> {
+export async function downloadAssets(jobId: string, imageUrls: string[], quality?: RenderQuality): Promise<string[]> {
   const outputDir = path.join(storagePaths.assets, jobId);
   await fs.mkdir(outputDir, { recursive: true });
+  const profile = getQualityProfile(quality);
+  const maxImages = Math.min(config.maxImageDownloads ?? profile.maxImages, profile.maxImages);
 
   const downloaded: DownloadedImage[] = [];
   const candidateUrls = uniqueValues(imageUrls.flatMap(expandImageCandidates));
-  for (const imageUrl of candidateUrls.slice(0, config.maxImageDownloads * 3)) {
+  for (const imageUrl of candidateUrls.slice(0, maxImages * 3)) {
     const image = await downloadImage(imageUrl);
     if (image) downloaded.push(image);
   }
@@ -26,15 +30,15 @@ export async function downloadAssets(jobId: string, imageUrls: string[]): Promis
   const usable = downloaded
     .sort((a, b) => b.width * b.height - a.width * a.height)
     .filter((image, index) => index === 0 || Math.min(image.width, image.height) >= 480)
-    .slice(0, config.maxImageDownloads);
+    .slice(0, maxImages);
 
   const saved: string[] = [];
   for (const image of usable) {
     const filePath = path.join(outputDir, `image-${saved.length + 1}.jpg`);
     await sharp(image.buffer)
       .rotate()
-      .resize(540, 540, { fit: "inside", withoutEnlargement: true })
-      .jpeg({ quality: 72 })
+      .resize(profile.imageSize, profile.imageSize, { fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: profile.imageQuality })
       .toFile(filePath);
     saved.push(filePath);
   }

@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { config, storagePaths } from "../config";
 import type { RenderInput } from "../types";
+import { getQualityProfile } from "./qualityProfiles";
 
 export async function renderProductVideo(input: RenderInput): Promise<string> {
   await fs.mkdir(storagePaths.videos, { recursive: true });
@@ -11,6 +12,7 @@ export async function renderProductVideo(input: RenderInput): Promise<string> {
   const entryPoint = path.resolve(config.rootDir, "remotion/index.ts");
   const serveUrl = await bundle({ entryPoint });
   const outputPath = path.join(storagePaths.videos, `${input.jobId}.mp4`);
+  const profile = getQualityProfile(input.options.quality);
   const renderInput = {
     ...input,
     images: input.images.map(fileToStorageUrl),
@@ -34,6 +36,7 @@ export async function renderProductVideo(input: RenderInput): Promise<string> {
     composition,
     serveUrl,
     codec: "h264",
+    crf: profile.crf,
     outputLocation: outputPath,
     inputProps: renderInput,
     concurrency: 1

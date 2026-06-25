@@ -17,6 +17,7 @@ const input: CreateJobInput = {
   tone: (args.tone as CreateJobInput["tone"]) || "review",
   voice: args.voice || config.defaultVoice,
   template: (args.template as CreateJobInput["template"]) || "tiktok",
+  quality: (args.quality as CreateJobInput["quality"]) || "low",
   showPrice: args.showPrice !== "false",
   showSubtitle: args.showSubtitle !== "false"
 };

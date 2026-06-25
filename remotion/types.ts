@@ -35,6 +35,7 @@ export type RenderInput = {
     showPrice: boolean;
     showSubtitle: boolean;
     template: "clean" | "tiktok" | "review" | "sale";
+    quality: "low" | "balanced" | "high" | "ultra";
     logoPath?: string;
     backgroundMusicPath?: string;
   };

@@ -11,7 +11,7 @@ export const config = {
   appBaseUrl: process.env.APP_BASE_URL ?? "http://localhost:3000",
   storageDir: path.resolve(rootDir, process.env.STORAGE_DIR ?? "storage"),
   databasePath: path.resolve(rootDir, process.env.DATABASE_PATH ?? "storage/jobs/jobs.sqlite"),
-  maxImageDownloads: Number(process.env.MAX_IMAGE_DOWNLOADS ?? 2),
+  maxImageDownloads: process.env.MAX_IMAGE_DOWNLOADS ? Number(process.env.MAX_IMAGE_DOWNLOADS) : undefined,
   maxImageBytes: Number(process.env.MAX_IMAGE_BYTES ?? 4_000_000),
   defaultVoice: process.env.DEFAULT_VOICE ?? "vi-VN-HoaiMyNeural",
   kiraApiKey: process.env.KIRA_API_KEY || process.env.OPENAI_API_KEY,

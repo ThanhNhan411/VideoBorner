@@ -17,6 +17,7 @@ const createJobSchema = z.object({
   tone: z.enum(["review", "sales", "quick_intro", "trend", "funny", "premium"]).default("review"),
   voice: z.string().default(config.defaultVoice),
   template: z.enum(["clean", "tiktok", "review", "sale"]).default("tiktok"),
+  quality: z.enum(["low", "balanced", "high", "ultra"]).default("low"),
   showPrice: z.boolean().default(true),
   showSubtitle: z.boolean().default(true)
 });

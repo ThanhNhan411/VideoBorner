@@ -4,6 +4,8 @@ export type Tone = "review" | "sales" | "quick_intro" | "trend" | "funny" | "pre
 
 export type VideoTemplate = "clean" | "tiktok" | "review" | "sale";
 
+export type RenderQuality = "low" | "balanced" | "high" | "ultra";
+
 export type ProductData = {
   url: string;
   title: string;
@@ -43,6 +45,7 @@ export type RenderInput = {
     showPrice: boolean;
     showSubtitle: boolean;
     template: VideoTemplate;
+    quality: RenderQuality;
     logoPath?: string;
     backgroundMusicPath?: string;
   };
@@ -55,6 +58,7 @@ export type CreateJobInput = {
   tone: Tone;
   voice: string;
   template: VideoTemplate;
+  quality: RenderQuality;
   showPrice: boolean;
   showSubtitle: boolean;
 };

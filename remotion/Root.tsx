@@ -2,9 +2,16 @@ import { Composition } from "remotion";
 import { ProductVideo } from "./ProductVideo";
 import type { RenderInput } from "./types";
 
-const VIDEO_WIDTH = 540;
-const VIDEO_HEIGHT = 720;
-const FPS = 24;
+const qualityProfiles = {
+  low: { width: 540, height: 720, fps: 24 },
+  balanced: { width: 720, height: 960, fps: 24 },
+  high: { width: 810, height: 1080, fps: 30 },
+  ultra: { width: 1080, height: 1440, fps: 30 }
+} as const;
+
+function getQualityProfile(quality: RenderInput["options"]["quality"] | undefined) {
+  return qualityProfiles[quality ?? "low"];
+}
 
 const defaultInput: RenderInput = {
   jobId: "preview",
@@ -32,22 +39,29 @@ const defaultInput: RenderInput = {
   },
   images: [],
   audioPath: "",
-  options: { showPrice: true, showSubtitle: true, template: "tiktok" }
+  options: { showPrice: true, showSubtitle: true, template: "tiktok", quality: "low" }
 };
+const defaultProfile = getQualityProfile(defaultInput.options.quality);
 
 export default function Root() {
   return (
     <Composition
       id="ProductVideo"
       component={ProductVideo}
-      durationInFrames={defaultInput.script.duration * FPS}
-      fps={FPS}
-      width={VIDEO_WIDTH}
-      height={VIDEO_HEIGHT}
+      durationInFrames={defaultInput.script.duration * defaultProfile.fps}
+      fps={defaultProfile.fps}
+      width={defaultProfile.width}
+      height={defaultProfile.height}
       defaultProps={defaultInput}
-      calculateMetadata={({ props }) => ({
-        durationInFrames: props.script.duration * FPS
-      })}
+      calculateMetadata={({ props }) => {
+        const profile = getQualityProfile(props.options.quality);
+        return {
+          durationInFrames: props.script.duration * profile.fps,
+          fps: profile.fps,
+          width: profile.width,
+          height: profile.height
+        };
+      }}
     />
   );
 }

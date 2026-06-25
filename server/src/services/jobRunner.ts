@@ -35,7 +35,7 @@ async function run(jobId: string) {
     updateJob(jobId, { title: product.title, product_json: JSON.stringify(product) });
 
     setJobStatus(jobId, "downloading_assets", "Đang tải ảnh sản phẩm");
-    const assets = await downloadAssets(jobId, product.images);
+    const assets = await downloadAssets(jobId, product.images, options.quality);
     updateJob(jobId, { assets_json: JSON.stringify(assets) });
 
     setJobStatus(jobId, "generating_script", "Đang tạo kịch bản");
@@ -60,7 +60,8 @@ async function run(jobId: string) {
       options: {
         showPrice: options.showPrice,
         showSubtitle: options.showSubtitle,
-        template: options.template
+        template: options.template,
+        quality: options.quality
       }
     });
     updateJob(jobId, { video_path: videoPath, status: "completed" });
@@ -88,7 +89,8 @@ export async function rerenderJob(jobId: string, patch: Partial<CreateJobInput>)
     options: {
       showPrice: options.showPrice,
       showSubtitle: options.showSubtitle,
-      template: options.template
+      template: options.template,
+      quality: options.quality
     }
   });
   updateJob(jobId, { video_path: videoPath, status: "completed" });

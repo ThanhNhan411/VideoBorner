@@ -40,6 +40,7 @@ function App() {
     duration: 30,
     tone: "review",
     template: "tiktok",
+    quality: "low",
     voice: "vi-VN-HoaiMyNeural",
     showPrice: true,
     showSubtitle: true
@@ -170,6 +171,16 @@ function App() {
               </select>
             </label>
           </div>
+
+          <label>
+            Cháº¥t lÆ°á»£ng
+            <select value={form.quality} onChange={(event) => setForm({ ...form, quality: event.target.value })}>
+              <option value="low">Low - 540x720 24fps (Render 512MB)</option>
+              <option value="balanced">Balanced - 720x960 24fps</option>
+              <option value="high">High - 810x1080 30fps</option>
+              <option value="ultra">Ultra - 1080x1440 30fps (local)</option>
+            </select>
+          </label>
 
           <div className="toggles">
             <label>
