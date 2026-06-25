@@ -19,15 +19,15 @@ export async function generateScript(product: ProductData, input: CreateJobInput
     try {
       return await generateScriptWithGemini(product, input);
     } catch (error) {
-      console.warn(`Gemini script generation failed, trying Kira AI: ${error instanceof Error ? error.message : error}`);
+      console.warn(`Gemini script generation failed: ${formatError(error)}`);
     }
   }
 
-  if (config.kiraApiKey) {
+  if (config.kiraApiKey && config.enableKiraScript) {
     try {
       return await generateScriptWithKira(product, input);
     } catch (error) {
-      console.warn(`Kira script generation failed, falling back to template: ${error instanceof Error ? error.message : error}`);
+      console.warn(`Kira script generation failed, falling back to template: ${formatError(error)}`);
     }
   }
 
@@ -90,7 +90,7 @@ async function generateScriptWithGemini(product: ProductData, input: CreateJobIn
         return normalizeGeneratedScript(parsed, product, input, spokenName);
       } catch (error) {
         lastError = error;
-        console.warn(`Gemini key ${keyIndex + 1} failed with model ${model}: ${error instanceof Error ? error.message : error}`);
+        console.warn(`Gemini key ${keyIndex + 1} failed with model ${model}: ${formatError(error)}`);
       }
     }
   }
@@ -176,6 +176,11 @@ function parseJsonResponse(text: string): unknown {
 
 function limitText(value: string, maxLength: number) {
   return value.replace(/\s+/g, " ").trim().slice(0, maxLength);
+}
+
+function formatError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.length > 500 ? `${message.slice(0, 497)}...` : message;
 }
 
 function normalizeGeneratedScript(

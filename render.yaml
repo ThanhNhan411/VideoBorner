@@ -40,3 +40,5 @@ services:
         value: https://kiraai.vn/api/v1
       - key: KIRA_MODEL
         value: kira-mini-1.0
+      - key: ENABLE_KIRA_SCRIPT
+        value: false

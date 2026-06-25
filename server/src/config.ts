@@ -27,6 +27,7 @@ export const config = {
   kiraApiKey: process.env.KIRA_API_KEY || process.env.OPENAI_API_KEY,
   kiraBaseUrl: process.env.KIRA_BASE_URL || process.env.LOCAL_LLM_BASE_URL || "https://kiraai.vn/api/v1",
   kiraModel: process.env.KIRA_MODEL ?? "kira-mini-1.0",
+  enableKiraScript: process.env.ENABLE_KIRA_SCRIPT === "true",
   edgeTtsProxy: process.env.EDGE_TTS_PROXY?.trim() || undefined
 };
 
