@@ -71,11 +71,12 @@ async function generateScriptWithKira(product: ProductData, input: CreateJobInpu
     messages: [
       {
         role: "system",
-        content: "You are a Vietnamese TikTok Shop copywriter. Return only valid JSON."
+        content: "You are a Vietnamese TikTok Shop copywriter. Return only one complete valid JSON object. Do not use markdown."
       },
       { role: "user", content: prompt }
     ],
-    max_tokens: 700,
+    response_format: { type: "json_object" },
+    max_tokens: 1400,
     temperature: 0.75
   });
 
@@ -128,8 +129,18 @@ function parseJsonResponse(text: string): unknown {
     throw new Error(`AI trả về nội dung quá lớn (${text.length} ký tự)`);
   }
   const trimmed = text.trim();
-  const json = trimmed.startsWith("```") ? trimmed.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "") : trimmed;
+  const unwrapped = trimmed.startsWith("```")
+    ? trimmed.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim()
+    : trimmed;
+  const json = extractJsonObject(unwrapped);
   return JSON.parse(json);
+}
+
+function extractJsonObject(text: string) {
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) return text;
+  return text.slice(start, end + 1);
 }
 
 function limitText(value: string, maxLength: number) {
