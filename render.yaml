@@ -21,7 +21,7 @@ services:
       - key: STORAGE_DIR
         value: /app/storage
       - key: MAX_IMAGE_DOWNLOADS
-        value: 6
+        value: 4
       - key: MAX_IMAGE_BYTES
         value: 8000000
       - key: DEFAULT_VOICE

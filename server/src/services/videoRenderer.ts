@@ -13,13 +13,13 @@ export async function renderProductVideo(input: RenderInput): Promise<string> {
   const outputPath = path.join(storagePaths.videos, `${input.jobId}.mp4`);
   const renderInput = {
     ...input,
-    images: await Promise.all(input.images.map(fileToDataUrl)),
-    audioPath: await fileToDataUrl(input.audioPath),
+    images: input.images.map(fileToStorageUrl),
+    audioPath: fileToStorageUrl(input.audioPath),
     options: {
       ...input.options,
-      logoPath: input.options.logoPath ? await fileToDataUrl(input.options.logoPath) : undefined,
+      logoPath: input.options.logoPath ? fileToStorageUrl(input.options.logoPath) : undefined,
       backgroundMusicPath: input.options.backgroundMusicPath
-        ? await fileToDataUrl(input.options.backgroundMusicPath)
+        ? fileToStorageUrl(input.options.backgroundMusicPath)
         : undefined
     }
   };
@@ -35,23 +35,23 @@ export async function renderProductVideo(input: RenderInput): Promise<string> {
     serveUrl,
     codec: "h264",
     outputLocation: outputPath,
-    inputProps: renderInput
+    inputProps: renderInput,
+    concurrency: 1
   });
 
   return outputPath;
 }
 
-async function fileToDataUrl(filePath: string) {
+function fileToStorageUrl(filePath: string) {
   const absolutePath = path.resolve(filePath);
-  const buffer = await fs.readFile(absolutePath);
-  return `data:${mimeType(absolutePath)};base64,${buffer.toString("base64")}`;
-}
+  const relativePath = path.relative(config.storageDir, absolutePath);
+  if (relativePath.startsWith("..") || path.isAbsolute(relativePath)) {
+    throw new Error(`File render nằm ngoài STORAGE_DIR: ${absolutePath}`);
+  }
 
-function mimeType(filePath: string) {
-  const ext = path.extname(filePath).toLowerCase();
-  if (ext === ".png") return "image/png";
-  if (ext === ".webp") return "image/webp";
-  if (ext === ".mp3") return "audio/mpeg";
-  if (ext === ".wav") return "audio/wav";
-  return "image/jpeg";
+  const encodedPath = relativePath
+    .split(path.sep)
+    .map((part) => encodeURIComponent(part))
+    .join("/");
+  return `http://127.0.0.1:${config.port}/storage/${encodedPath}`;
 }

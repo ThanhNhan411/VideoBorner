@@ -18,7 +18,7 @@ export const config = {
   appBaseUrl: process.env.APP_BASE_URL ?? "http://localhost:3000",
   storageDir: path.resolve(rootDir, process.env.STORAGE_DIR ?? "storage"),
   databasePath: path.resolve(rootDir, process.env.DATABASE_PATH ?? "storage/jobs/jobs.sqlite"),
-  maxImageDownloads: Number(process.env.MAX_IMAGE_DOWNLOADS ?? 6),
+  maxImageDownloads: Number(process.env.MAX_IMAGE_DOWNLOADS ?? 4),
   maxImageBytes: Number(process.env.MAX_IMAGE_BYTES ?? 8_000_000),
   defaultVoice: process.env.DEFAULT_VOICE ?? "vi-VN-HoaiMyNeural",
   geminiApiKey: geminiApiKeys[0],
